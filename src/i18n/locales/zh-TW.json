@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "CounselingNow",
+    "subtitle": "透過命理分析，找到適合您的諮商取向"
+  },
+  "input": {
+    "birthDate": "國曆出生日期",
+    "birthHour": "出生時辰",
+    "gender": "性別",
+    "male": "男",
+    "female": "女",
+    "nextStep": "下一步：選擇占卜方式"
+  },
+  "method": {
+    "title": "選擇占卜方式",
+    "subtitle": "您可以選擇一種或多種占卜方式來分析諮商時機與取向",
+    "ziwei": "紫微斗數",
+    "ziweiDesc": "命盤分析",
+    "bazi": "八字四柱",
+    "baziDesc": "五行分析",
+    "iching": "易經",
+    "ichingDesc": "蓍草/銅錢占卜",
+    "tarot": "塔羅",
+    "tarotDesc": "牌陣解讀",
+    "selected": "已選擇",
+    "startAnalysis": "開始分析",
+    "analyzing": "分析中...",
+    "prevStep": "上一步"
+  },
+  "result": {
+    "timing": "諮商時機評估",
+    "wuxing": "五行特質分析",
+    "therapy": "諮商取向推薦",
+    "overall": "綜合建議",
+    "restart": "重新分析",
+    "dominant": "主導五行",
+    "deficient": "不足五行"
+  },
+  "elements": {
+    "wood": "木",
+    "fire": "火",
+    "earth": "土",
+    "metal": "金",
+    "water": "水"
+  },
+  "elementTraits": {
+    "wood": "成長、疏通、彈性",
+    "fire": "情緒、轉化、創造",
+    "earth": "穩定、承載、關係",
+    "metal": "邏輯、結構、界限",
+    "water": "深層、流動、覺察"
+  },
+  "footer": {
+    "disclaimer": "本工具僅供參考，選擇心理諮商服務時，應以專業度、口碑與自身感受為主要考量",
+    "reference": "參考資源：李政洋身心診所 | 開源專案：iztro"
+  }
+}

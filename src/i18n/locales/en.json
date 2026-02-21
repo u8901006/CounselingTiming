@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "CounselingNow",
+    "subtitle": "Find your ideal counseling approach through traditional divination"
+  },
+  "input": {
+    "birthDate": "Birth Date (Gregorian)",
+    "birthHour": "Birth Hour",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "nextStep": "Next: Choose Divination Methods"
+  },
+  "method": {
+    "title": "Choose Divination Methods",
+    "subtitle": "Select one or more methods to analyze your counseling timing and orientation",
+    "ziwei": "Zi Wei Dou Shu",
+    "ziweiDesc": "Star Chart Analysis",
+    "bazi": "Four Pillars (BaZi)",
+    "baziDesc": "Five Elements Analysis",
+    "iching": "I Ching",
+    "ichingDesc": "Yarrow/Coin Divination",
+    "tarot": "Tarot",
+    "tarotDesc": "Card Reading",
+    "selected": "Selected",
+    "startAnalysis": "Start Analysis",
+    "analyzing": "Analyzing...",
+    "prevStep": "Previous"
+  },
+  "result": {
+    "timing": "Counseling Timing Assessment",
+    "wuxing": "Five Elements Analysis",
+    "therapy": "Recommended Therapy Approaches",
+    "overall": "Overall Recommendation",
+    "restart": "Start Over",
+    "dominant": "Dominant Element",
+    "deficient": "Deficient Element"
+  },
+  "elements": {
+    "wood": "Wood",
+    "fire": "Fire",
+    "earth": "Earth",
+    "metal": "Metal",
+    "water": "Water"
+  },
+  "elementTraits": {
+    "wood": "Growth, Flow, Flexibility",
+    "fire": "Emotion, Transformation, Creativity",
+    "earth": "Stability, Support, Relationships",
+    "metal": "Logic, Structure, Boundaries",
+    "water": "Depth, Flow, Awareness"
+  },
+  "footer": {
+    "disclaimer": "This tool is for reference only. When choosing counseling services, prioritize professionalism, reputation, and your own feelings.",
+    "reference": "Reference: Lee Psychiatric Clinic | Open Source: iztro"
+  }
+}

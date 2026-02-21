@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+.element-wood { @apply text-wood-dark bg-wood-light; }
+.element-fire { @apply text-fire-dark bg-fire-light; }
+.element-earth { @apply text-earth-dark bg-earth-light; }
+.element-metal { @apply text-metal-dark bg-metal-light; }
+.element-water { @apply text-water-dark bg-water-light; }
+
+.score-bar {
+  @apply h-4 rounded-full transition-all duration-500;
+}
+
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-shadow hover:shadow-xl;
+}
