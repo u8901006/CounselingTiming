@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useAppStore } from './store/useAppStore'
@@ -17,7 +17,47 @@ import ExportButton from './components/ExportButton'
 import ThemeToggle from './components/ThemeToggle'
 import LanguageSwitcher from './components/LanguageSwitcher'
 
+function Navigation() {
+  const { t } = useTranslation()
+  
+  return (
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 mb-4">
+      <div className="max-w-4xl mx-auto px-4 py-2">
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Link 
+            to="/" 
+            className="px-3 py-1 text-sm rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 dark:text-gray-200"
+          >
+            {t('nav.home') || '首頁'}
+          </Link>
+          <Link 
+            to="/numerology" 
+            className="px-3 py-1 text-sm rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 dark:text-gray-200"
+          >
+            數字命理
+          </Link>
+          <Link 
+            to="/western-astro" 
+            className="px-3 py-1 text-sm rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 dark:text-gray-200"
+          >
+            西洋占星
+          </Link>
+          <Link 
+            to="/vedic-astro" 
+            className="px-3 py-1 text-sm rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 dark:text-gray-200"
+          >
+            吠陀占星
+          </Link>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
 import TherapyDetailPage from './pages/TherapyDetail'
+import NumerologyPage from './pages/Numerology'
+import WesternAstroPage from './pages/WesternAstro'
+import VedicAstroPage from './pages/VedicAstro'
 
 import { ELEMENT_NAMES } from './data/wuxing-therapy'
 import {
@@ -257,10 +297,12 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
       <Header title={t('app.title')} subtitle={t('app.subtitle')} />
 
-      <div className="flex justify-center gap-2 mb-8">
+      <div className="flex justify-center gap-2 mb-4">
         <ThemeToggle />
         <LanguageSwitcher />
       </div>
+
+      <Navigation />
 
       <ProgressBar currentStep={step} totalSteps={3} />
 
@@ -284,6 +326,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppContent />} />
+          <Route path="/numerology" element={<NumerologyPage />} />
+          <Route path="/western-astro" element={<WesternAstroPage />} />
+          <Route path="/vedic-astro" element={<VedicAstroPage />} />
           <Route path="/therapy/:id" element={<TherapyDetailPage />} />
         </Routes>
       </BrowserRouter>
