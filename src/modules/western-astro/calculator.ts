@@ -32,8 +32,8 @@ export function calculatePlanetaryPositions(
   day: number,
   hour: number,
   minute: number,
-  lat: number,
-  lng: number
+  _lat: number,
+  _lng: number
 ): PlanetData[] {
   const jd = calculateJulianDay(year, month, day, hour, minute);
   const positions: PlanetData[] = [];

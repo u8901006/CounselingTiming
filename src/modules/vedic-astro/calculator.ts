@@ -76,7 +76,7 @@ export function calculateVedicAstrology(
   hour: number,
   minute: number,
   lat: number,
-  lng: number
+  _lng: number
 ): VedicAstroChart {
   const jd = calculateJulianDay(year, month, day, hour, minute);
   const ayanamsa = getAyanamsa(jd);
