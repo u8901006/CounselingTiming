@@ -1,16 +1,35 @@
 import { create } from 'zustand'
 import { CounselingRecommendation } from '../analysis/orientation'
 import { DivinationResult } from '../modules/iching'
+import { NumerologyResult } from '../modules/numerology/types'
 import { TarotReading } from '../modules/tarot'
+import { VedicAstroChart } from '../modules/vedic-astro/types'
+import { WesternAstroChart } from '../modules/western-astro/types'
 import { ZiweiResult, BaziResult } from '../modules/ziwei'
 
-export type DivinationMethod = 'ziwei' | 'bazi' | 'iching' | 'tarot'
+export type DivinationMethod =
+  | 'ziwei'
+  | 'bazi'
+  | 'iching'
+  | 'tarot'
+  | 'western-astro'
+  | 'vedic-astro'
+  | 'numerology'
 
 export interface DivinationResults {
   iching: DivinationResult | null
   tarot: TarotReading | null
   ziwei: ZiweiResult | null
   bazi: BaziResult | null
+  westernAstro: WesternAstroChart | null
+  vedicAstro: VedicAstroChart | null
+  numerology: NumerologyResult | null
+}
+
+export interface LocationInput {
+  city: string
+  lat: number
+  lng: number
 }
 
 interface AppState {
@@ -18,6 +37,9 @@ interface AppState {
   birthDate: string
   birthHour: number
   gender: 'male' | 'female'
+  name: string
+  question: string
+  location: LocationInput
   selectedMethods: DivinationMethod[]
   result: CounselingRecommendation | null
   divinationResults: DivinationResults
@@ -27,6 +49,9 @@ interface AppState {
   setBirthDate: (date: string) => void
   setBirthHour: (hour: number) => void
   setGender: (gender: 'male' | 'female') => void
+  setName: (name: string) => void
+  setQuestion: (question: string) => void
+  setLocation: (location: LocationInput) => void
   toggleMethod: (method: DivinationMethod) => void
   setResult: (result: CounselingRecommendation | null) => void
   setDivinationResults: (results: DivinationResults) => void
@@ -39,6 +64,13 @@ const initialState = {
   birthDate: '',
   birthHour: 12,
   gender: 'male' as const,
+  name: '',
+  question: '',
+  location: {
+    city: '',
+    lat: 0,
+    lng: 0,
+  } as LocationInput,
   selectedMethods: ['ziwei', 'bazi'] as DivinationMethod[],
   result: null,
   divinationResults: {
@@ -46,6 +78,9 @@ const initialState = {
     tarot: null,
     ziwei: null,
     bazi: null,
+    westernAstro: null,
+    vedicAstro: null,
+    numerology: null,
   } as DivinationResults,
   isLoading: false,
 }
@@ -57,6 +92,9 @@ export const useAppStore = create<AppState>((set) => ({
   setBirthDate: (birthDate) => set({ birthDate }),
   setBirthHour: (birthHour) => set({ birthHour }),
   setGender: (gender) => set({ gender }),
+  setName: (name) => set({ name }),
+  setQuestion: (question) => set({ question }),
+  setLocation: (location) => set({ location }),
   toggleMethod: (method) => set((state) => ({
     selectedMethods: state.selectedMethods.includes(method)
       ? state.selectedMethods.filter((m) => m !== method)

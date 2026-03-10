@@ -1,10 +1,14 @@
+import { useTranslation } from 'react-i18next'
+
 interface GenderSelectProps {
   value: 'male' | 'female'
   onChange: (value: 'male' | 'female') => void
   label?: string
 }
 
-export function GenderSelect({ value, onChange, label = '性別' }: GenderSelectProps) {
+export function GenderSelect({ value, onChange, label }: GenderSelectProps) {
+  const { t } = useTranslation()
+
   return (
     <div>
       <label className="block text-sm font-medium mb-2">{label}</label>
@@ -18,7 +22,7 @@ export function GenderSelect({ value, onChange, label = '性別' }: GenderSelect
               : 'border-gray-300'
           }`}
         >
-          男
+          {t('input.male')}
         </button>
         <button
           type="button"
@@ -29,7 +33,7 @@ export function GenderSelect({ value, onChange, label = '性別' }: GenderSelect
               : 'border-gray-300'
           }`}
         >
-          女
+          {t('input.female')}
         </button>
       </div>
     </div>

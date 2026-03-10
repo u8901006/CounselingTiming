@@ -4,11 +4,38 @@
     "subtitle": "Find your ideal counseling approach through traditional divination"
   },
   "input": {
+    "title": "Enter Your Basic Information",
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
     "birthDate": "Birth Date (Gregorian)",
     "birthHour": "Birth Hour",
+    "birthHourOptions": {
+      "zi": "23:00 - 00:59 (Zi hour)",
+      "chou": "01:00 - 02:59 (Chou hour)",
+      "yin": "03:00 - 04:59 (Yin hour)",
+      "mao": "05:00 - 06:59 (Mao hour)",
+      "chen": "07:00 - 08:59 (Chen hour)",
+      "si": "09:00 - 10:59 (Si hour)",
+      "wu": "11:00 - 12:59 (Wu hour)",
+      "wei": "13:00 - 14:59 (Wei hour)",
+      "shen": "15:00 - 16:59 (Shen hour)",
+      "you": "17:00 - 18:59 (You hour)",
+      "xu": "19:00 - 20:59 (Xu hour)",
+      "hai": "21:00 - 22:59 (Hai hour)"
+    },
     "gender": "Gender",
     "male": "Male",
     "female": "Female",
+    "location": "Birth Location",
+    "locationPlaceholder": "Select birth location",
+    "cityOptions": {
+      "taipei": "Taipei City",
+      "newTaipei": "New Taipei City",
+      "taoyuan": "Taoyuan City",
+      "taichung": "Taichung City",
+      "tainan": "Tainan City",
+      "kaohsiung": "Kaohsiung City"
+    },
     "nextStep": "Next: Choose Divination Methods"
   },
   "method": {
@@ -22,6 +49,14 @@
     "ichingDesc": "Yarrow/Coin Divination",
     "tarot": "Tarot",
     "tarotDesc": "Card Reading",
+    "westernAstro": "Western Astrology",
+    "westernAstroDesc": "Planet and House Analysis",
+    "vedicAstro": "Vedic Astrology",
+    "vedicAstroDesc": "Lagna and Dasha Analysis",
+    "numerology": "Numerology",
+    "numerologyDesc": "Life Path and Cycle Analysis",
+    "question": "Topic you want to ask about",
+    "questionPlaceholder": "For example: Is this a good time for me to start counseling?",
     "selected": "Selected",
     "startAnalysis": "Start Analysis",
     "analyzing": "Analyzing...",
@@ -34,7 +69,61 @@
     "overall": "Overall Recommendation",
     "restart": "Start Over",
     "dominant": "Dominant Element",
-    "deficient": "Deficient Element"
+    "deficient": "Deficient Element",
+    "westernAstro": "Western Astrology",
+    "vedicAstro": "Vedic Astrology",
+    "numerology": "Numerology"
+  },
+  "gpt": {
+    "title": "GPT Prompt",
+    "description": "Paste this prompt into ChatGPT, or copy it manually from the preview if clipboard access fails.",
+    "previewLabel": "GPT prompt preview",
+    "copy": "Copy prompt",
+    "copied": "Copied",
+    "openChatGPT": "Open ChatGPT",
+    "copyFailed": "Copy failed. You can copy it manually from the preview."
+  },
+  "supplemental": {
+    "common": {
+      "degreeUnit": "deg",
+      "minuteUnit": "m",
+      "retrograde": "Rx",
+      "rangeSeparator": "-"
+    },
+    "westernAstro": {
+      "detailsUnavailable": "Western astrology details are unavailable for this result.",
+      "ascendant": "Ascendant",
+      "midheaven": "Midheaven",
+      "keyPlanets": "Key planets",
+      "unknownPlanet": "Unknown planet",
+      "planetPositionsUnavailable": "Planet positions unavailable.",
+      "mainAspects": "Main aspects",
+      "aspectDataUnavailable": "Aspect data unavailable",
+      "noMajorAspects": "No major aspects available."
+    },
+    "vedicAstro": {
+      "detailsUnavailable": "Vedic astrology details are unavailable for this result.",
+      "moonSign": "Moon sign",
+      "ascendant": "Ascendant",
+      "sunSign": "Sun sign",
+      "nakshatra": "Nakshatra",
+      "unavailable": "Unavailable",
+      "lord": "Lord",
+      "pada": "Pada",
+      "moonDegree": "Moon degree",
+      "currentDashaSequence": "Current dasha sequence",
+      "unknown": "Unknown",
+      "dashaDataUnavailable": "Dasha data unavailable."
+    },
+    "numerology": {
+      "lifePath": "Life path",
+      "destiny": "Destiny",
+      "soul": "Soul",
+      "personality": "Personality",
+      "birthday": "Birthday",
+      "expression": "Expression",
+      "detailsUnavailable": "Numerology details are unavailable for this result."
+    }
   },
   "elements": {
     "wood": "Wood",

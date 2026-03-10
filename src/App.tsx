@@ -1,7 +1,15 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useAppStore } from './store/useAppStore'
+import * as numerologyModule from './modules/numerology'
+import * as vedicAstroModule from './modules/vedic-astro'
+import * as westernAstroModule from './modules/western-astro'
+import {
+  useAppStore,
+  DivinationMethod,
+  DivinationResults,
+  LocationInput,
+} from './store/useAppStore'
 import { useHistoryStore } from './store/useHistoryStore'
 import { useThemeEffect } from './utils/theme'
 
@@ -11,7 +19,8 @@ import { InputForm } from './components/InputForm'
 import MethodSelector from './components/MethodSelector'
 import {
   ZiweiResult, BaziResult, IChingResult, TarotResult,
-  TimingScore, WuxingDisplay, TherapyRecommendation, OverallAdvice
+  WesternAstroResult, VedicAstroResult, NumerologyResult,
+  TimingScore, WuxingDisplay, TherapyRecommendation, OverallAdvice, GPTIntegration
 } from './components/Results'
 import ExportButton from './components/ExportButton'
 import ThemeToggle from './components/ThemeToggle'
@@ -73,14 +82,93 @@ import { getZiweiResult, getBaziResult, getZiweiTimingFactors } from './modules/
 
 import './i18n'
 
+interface SupplementalAnalysisInput {
+  birthDate: string
+  birthHour: number
+  name: string
+  location: LocationInput
+  selectedMethods: DivinationMethod[]
+}
+
+type SupplementalAnalysisResults = Pick<
+  DivinationResults,
+  'westernAstro' | 'vedicAstro' | 'numerology'
+>
+
+export function calculateSupplementalResults({
+  birthDate,
+  birthHour,
+  name,
+  location,
+  selectedMethods,
+}: SupplementalAnalysisInput): SupplementalAnalysisResults {
+  const [year, month, day] = birthDate.split('-').map(Number)
+
+  if (!year || !month || !day) {
+    throw new Error('Invalid birth date')
+  }
+
+  const hasLocation = Boolean(location.city) && Number.isFinite(location.lat) && Number.isFinite(location.lng)
+  const hasName = Boolean(name.trim())
+
+  let westernAstroResult = null
+  if (selectedMethods.includes('western-astro') && hasLocation) {
+    try {
+      westernAstroResult = westernAstroModule.calculateWesternAstrology(
+        year,
+        month,
+        day,
+        birthHour,
+        0,
+        location.lat,
+        location.lng,
+      )
+    } catch (error) {
+      console.error('Western astrology analysis failed:', error)
+    }
+  }
+
+  let vedicAstroResult = null
+  if (selectedMethods.includes('vedic-astro') && hasLocation) {
+    try {
+      vedicAstroResult = vedicAstroModule.calculateVedicAstrology(
+        year,
+        month,
+        day,
+        birthHour,
+        0,
+        location.lat,
+        location.lng,
+      )
+    } catch (error) {
+      console.error('Vedic astrology analysis failed:', error)
+    }
+  }
+
+  let numerologyResult = null
+  if (selectedMethods.includes('numerology') && hasName) {
+    try {
+      numerologyResult = numerologyModule.calculateNumerology(name, year, month, day)
+    } catch (error) {
+      console.error('Numerology analysis failed:', error)
+    }
+  }
+
+  return {
+    westernAstro: westernAstroResult,
+    vedicAstro: vedicAstroResult,
+    numerology: numerologyResult,
+  }
+}
+
 function AppContent() {
   const { t } = useTranslation()
   useThemeEffect()
 
   const {
     step, setStep,
-    birthDate, birthHour, gender,
-    setBirthDate, setBirthHour, setGender,
+    birthDate, birthHour, gender, name, question, location,
+    setBirthDate, setBirthHour, setGender, setName, setQuestion, setLocation,
     selectedMethods, toggleMethod,
     result, setResult,
     divinationResults, setDivinationResults,
@@ -94,6 +182,14 @@ function AppContent() {
     setIsLoading(true)
 
     try {
+      const supplementalResults = calculateSupplementalResults({
+        birthDate,
+        birthHour,
+        name,
+        location,
+        selectedMethods,
+      })
+
       const timingFactors: TimingFactor[] = []
       let allTarotCards: TarotCard[] = []
 
@@ -187,6 +283,9 @@ function AppContent() {
         tarot: tarotReading,
         ziwei: ziweiResult,
         bazi: baziResult,
+        westernAstro: supplementalResults.westernAstro,
+        vedicAstro: supplementalResults.vedicAstro,
+        numerology: supplementalResults.numerology,
       })
 
       addRecord({
@@ -217,9 +316,13 @@ function AppContent() {
       birthDate={birthDate}
       birthHour={birthHour}
       gender={gender}
+      name={name}
+      location={location}
       onBirthDateChange={setBirthDate}
       onBirthHourChange={setBirthHour}
       onGenderChange={setGender}
+      onNameChange={setName}
+      onLocationChange={setLocation}
       onNext={() => setStep(2)}
     />
   )
@@ -231,6 +334,8 @@ function AppContent() {
       onBack={() => setStep(1)}
       onAnalyze={handleAnalyze}
       isLoading={isLoading}
+      question={question}
+      onQuestionChange={setQuestion}
     />
   )
 
@@ -263,6 +368,18 @@ function AppContent() {
           <TarotResult reading={divinationResults.tarot} />
         )}
 
+        {selectedMethods.includes('western-astro') && (
+          <WesternAstroResult chart={divinationResults.westernAstro} />
+        )}
+
+        {selectedMethods.includes('vedic-astro') && (
+          <VedicAstroResult chart={divinationResults.vedicAstro} />
+        )}
+
+        {selectedMethods.includes('numerology') && (
+          <NumerologyResult result={divinationResults.numerology} />
+        )}
+
         <TimingScore
           score={timing.score}
           level={timing.level}
@@ -278,6 +395,8 @@ function AppContent() {
         <TherapyRecommendation therapies={orientation.therapies} />
 
         <OverallAdvice advice={overallAdvice} />
+
+        <GPTIntegration />
 
         <div className="flex gap-2 justify-center">
           <ExportButton targetId="result-content" />
