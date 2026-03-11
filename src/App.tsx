@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -20,11 +21,13 @@ import MethodSelector from './components/MethodSelector'
 import {
   ZiweiResult, BaziResult, IChingResult, TarotResult,
   WesternAstroResult, VedicAstroResult, NumerologyResult,
-  TimingScore, WuxingDisplay, TherapyRecommendation, OverallAdvice, GPTIntegration
+  TimingScore, WuxingDisplay, TherapyRecommendation, OverallAdvice, GPTIntegration,
+  CopyAllResultsAction,
 } from './components/Results'
 import ExportButton from './components/ExportButton'
 import ThemeToggle from './components/ThemeToggle'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import { buildResultSummary } from './utils/resultSummary'
 
 function Navigation() {
   const { t } = useTranslation()
@@ -162,7 +165,7 @@ export function calculateSupplementalResults({
 }
 
 function AppContent() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   useThemeEffect()
 
   const {
@@ -177,6 +180,30 @@ function AppContent() {
   } = useAppStore()
 
   const { addRecord } = useHistoryStore()
+
+  const resultSummary = useMemo(
+    () =>
+      buildResultSummary({
+        question,
+        selectedMethods,
+        divinationResults,
+        result,
+        t,
+      }),
+    [divinationResults, i18n.resolvedLanguage, question, result, selectedMethods, t],
+  )
+
+  const hasMeaningfulResultSummary = useMemo(() => {
+    if (!result) {
+      return false
+    }
+
+    if (selectedMethods.length > 0) {
+      return true
+    }
+
+    return Boolean(result.overallAdvice.trim())
+  }, [result, selectedMethods])
 
   const handleAnalyze = async () => {
     setIsLoading(true)
@@ -399,6 +426,10 @@ function AppContent() {
         <GPTIntegration />
 
         <div className="flex gap-2 justify-center">
+          <CopyAllResultsAction
+            summaryText={resultSummary}
+            hasMeaningfulContent={hasMeaningfulResultSummary}
+          />
           <ExportButton targetId="result-content" />
         </div>
 

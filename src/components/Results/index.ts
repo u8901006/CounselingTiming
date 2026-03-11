@@ -10,3 +10,4 @@ export { WuxingDisplay } from './WuxingDisplay';
 export { TherapyRecommendation, type TherapyMatch } from './TherapyRecommendation';
 export { OverallAdvice } from './OverallAdvice';
 export { GPTIntegration } from './GPTIntegration';
+export { CopyAllResultsAction } from './CopyAllResultsAction';
