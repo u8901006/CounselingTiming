@@ -4,7 +4,7 @@ interface BirthDateInputProps {
   label?: string
 }
 
-export function BirthDateInput({ value, onChange, label = '國曆出生日期' }: BirthDateInputProps) {
+export function BirthDateInput({ value, onChange, label }: BirthDateInputProps) {
   return (
     <div>
       <label className="block text-sm font-medium mb-2">{label}</label>
