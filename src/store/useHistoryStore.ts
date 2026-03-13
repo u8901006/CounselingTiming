@@ -2,12 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { CounselingRecommendation } from '../analysis/orientation'
 import { DivinationResult } from '../modules/iching'
+import { LiuyaoHexagramResult } from '../modules/liuyao'
 import { TarotReading } from '../modules/tarot'
 import { ZiweiResult, BaziResult } from '../modules/ziwei'
 import { DivinationMethod } from './useAppStore'
 
 interface DivinationResultsSnapshot {
   iching: DivinationResult | null
+  liuyao: LiuyaoHexagramResult | null
   tarot: TarotReading | null
   ziwei: ZiweiResult | null
   bazi: BaziResult | null

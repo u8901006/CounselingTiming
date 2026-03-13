@@ -11,6 +11,10 @@ const methodIcons: Record<DivinationMethod, string> = {
   bazi: '☯️',
   iching: '🔮',
   tarot: '🃏',
+  liuyao: '🪙',
+  'western-astro': '🌞',
+  'vedic-astro': '🪐',
+  numerology: '#',
 }
 
 const methodLabels: Record<DivinationMethod, string> = {
@@ -18,6 +22,10 @@ const methodLabels: Record<DivinationMethod, string> = {
   bazi: '八字',
   iching: '易經',
   tarot: '塔羅',
+  liuyao: '六爻',
+  'western-astro': '西洋占星',
+  'vedic-astro': '吠陀占星',
+  numerology: '數字命理',
 }
 
 const formatDate = (timestamp: number): string => {
