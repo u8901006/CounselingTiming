@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { DivinationMethod } from '../../store/useAppStore'
+import LiuyaoInput from '../LiuyaoInput'
+import { DivinationMethod, useAppStore } from '../../store/useAppStore'
 
 interface MethodSelectorProps {
   selectedMethods: DivinationMethod[]
@@ -52,6 +53,14 @@ const METHOD_OPTIONS: {
     defaultDescription: '牌陣解讀',
   },
   {
+    id: 'liuyao',
+    icon: '🪙',
+    nameKey: 'method.liuyao',
+    descKey: 'method.liuyaoDesc',
+    defaultName: '六爻',
+    defaultDescription: '手動輸入或自動起卦',
+  },
+  {
     id: 'western-astro',
     icon: '☉',
     nameKey: 'method.westernAstro',
@@ -87,7 +96,15 @@ export default function MethodSelector({
   onQuestionChange,
 }: MethodSelectorProps) {
   const { t } = useTranslation()
-  const canAnalyze = selectedMethods.length > 0 && question.trim().length > 0 && !isLoading
+  const liuyaoDraft = useAppStore((state) => state.liuyaoDraft)
+  const hasValidLiuyaoDraft =
+    liuyaoDraft !== null && liuyaoDraft.lines.length === 6 && Array.isArray(liuyaoDraft.movingLineIndexes)
+  const requiresLiuyaoDraft = selectedMethods.includes('liuyao')
+  const canAnalyze =
+    selectedMethods.length > 0 &&
+    question.trim().length > 0 &&
+    !isLoading &&
+    (!requiresLiuyaoDraft || hasValidLiuyaoDraft)
 
   return (
     <div className="card max-w-lg mx-auto">
@@ -141,14 +158,18 @@ export default function MethodSelector({
           ))}
         </div>
 
+        {selectedMethods.includes('liuyao') ? <LiuyaoInput /> : null}
+
         <div className="flex gap-4 pt-4">
           <button
+            type="button"
             onClick={onBack}
             className="flex-1 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-gray-200"
           >
             {t('method.prevStep')}
           </button>
           <button
+            type="button"
             onClick={onAnalyze}
             disabled={!canAnalyze}
             className="flex-1 py-3 bg-water text-white rounded-lg font-medium hover:bg-water-dark disabled:opacity-50 disabled:cursor-not-allowed"

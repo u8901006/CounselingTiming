@@ -20,6 +20,7 @@ import { InputForm } from './components/InputForm'
 import MethodSelector from './components/MethodSelector'
 import {
   ZiweiResult, BaziResult, IChingResult, TarotResult,
+  LiuyaoResult,
   WesternAstroResult, VedicAstroResult, NumerologyResult,
   TimingScore, WuxingDisplay, TherapyRecommendation, OverallAdvice, GPTIntegration,
   CopyAllResultsAction,
@@ -173,6 +174,7 @@ function AppContent() {
     birthDate, birthHour, gender, name, question, location,
     setBirthDate, setBirthHour, setGender, setName, setQuestion, setLocation,
     selectedMethods, toggleMethod,
+    liuyaoDraft,
     result, setResult,
     divinationResults, setDivinationResults,
     isLoading, setIsLoading,
@@ -299,6 +301,8 @@ function AppContent() {
         })))
       }
 
+      const liuyaoResult = selectedMethods.includes('liuyao') ? liuyaoDraft : null
+
       const ziweiTraits = ziweiResult?.majorStars ? ['深層探索'] : []
       const timing = analyzeTiming(timingFactors)
       const orientation = matchCounselingOrientation(elementScores, ziweiTraits)
@@ -307,6 +311,7 @@ function AppContent() {
       setResult(recommendation)
       setDivinationResults({
         iching: ichingDivResult,
+        liuyao: liuyaoResult,
         tarot: tarotReading,
         ziwei: ziweiResult,
         bazi: baziResult,
@@ -323,6 +328,7 @@ function AppContent() {
         result: recommendation,
         divinationResults: {
           iching: ichingDivResult,
+          liuyao: liuyaoResult,
           tarot: tarotReading,
           ziwei: ziweiResult,
           bazi: baziResult,
@@ -393,6 +399,10 @@ function AppContent() {
 
         {selectedMethods.includes('tarot') && divinationResults.tarot && (
           <TarotResult reading={divinationResults.tarot} />
+        )}
+
+        {selectedMethods.includes('liuyao') && divinationResults.liuyao && (
+          <LiuyaoResult result={divinationResults.liuyao} />
         )}
 
         {selectedMethods.includes('western-astro') && (

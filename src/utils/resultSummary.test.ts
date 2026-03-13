@@ -36,6 +36,7 @@ describe('buildResultSummary', () => {
       selectedMethods: ['ziwei', 'western-astro', 'numerology'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         bazi: null,
         vedicAstro: null,
@@ -127,6 +128,7 @@ describe('buildResultSummary', () => {
       selectedMethods: ['tarot', 'vedic-astro'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         ziwei: null,
         bazi: null,
         westernAstro: null,
@@ -160,6 +162,7 @@ describe('buildResultSummary', () => {
       selectedMethods: ['ziwei'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         bazi: null,
         westernAstro: null,
@@ -194,12 +197,46 @@ describe('buildResultSummary', () => {
     expect(text).not.toContain('123')
   })
 
+  it('includes liuyao output in the copy-all summary', () => {
+    const text = buildResultSummary({
+      question: '這次適合展開新的諮商節奏嗎？',
+      selectedMethods: ['liuyao'],
+      divinationResults: {
+        iching: null,
+        tarot: null,
+        bazi: null,
+        ziwei: null,
+        westernAstro: null,
+        vedicAstro: null,
+        numerology: null,
+        liuyao: {
+          lines: [
+            { value: 'yang', isMoving: false },
+            { value: 'yin', isMoving: true },
+            { value: 'yang', isMoving: false },
+            { value: 'yin', isMoving: false },
+            { value: 'yang', isMoving: true },
+            { value: 'yin', isMoving: false },
+          ],
+          movingLineIndexes: [2, 5],
+        },
+      } satisfies DivinationResults,
+      result: createRecommendation(),
+    })
+
+    expect(text).toContain('六爻')
+    expect(text).toContain('本卦：陽靜、陰動、陽靜、陰靜、陽動、陰靜')
+    expect(text).toContain('之卦：陽靜、陽靜、陽靜、陰靜、陰靜、陰靜')
+    expect(text).toContain('動爻：2、5')
+  })
+
   it('uses localized English separators and row formatting', () => {
     const text = buildResultSummary({
       question: 'Is this a good time to begin counseling?',
       selectedMethods: ['ziwei', 'western-astro', 'numerology'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         bazi: null,
         ziwei: {
@@ -285,5 +322,39 @@ describe('buildResultSummary', () => {
     expect(text).toContain('Life path: 7')
     expect(text).toContain('Overall recommendation')
     expect(text).toContain('Timing assessment: 建議 (78 pts)')
+  })
+
+  it('uses localized English liuyao labels and line formatting', () => {
+    const text = buildResultSummary({
+      question: 'Is this a good time to start a new counseling rhythm?',
+      selectedMethods: ['liuyao'],
+      divinationResults: {
+        iching: null,
+        tarot: null,
+        bazi: null,
+        ziwei: null,
+        westernAstro: null,
+        vedicAstro: null,
+        numerology: null,
+        liuyao: {
+          lines: [
+            { value: 'yang', isMoving: false },
+            { value: 'yin', isMoving: true },
+            { value: 'yang', isMoving: false },
+            { value: 'yin', isMoving: false },
+            { value: 'yang', isMoving: true },
+            { value: 'yin', isMoving: false },
+          ],
+          movingLineIndexes: [2, 5],
+        },
+      } satisfies DivinationResults,
+      result: null,
+      t: i18n.getFixedT('en'),
+    })
+
+    expect(text).toContain('Liuyao')
+    expect(text).toContain('Primary hexagram: Yang static, Yin moving, Yang static, Yin static, Yang moving, Yin static')
+    expect(text).toContain('Transformed hexagram: Yang static, Yang static, Yang static, Yin static, Yin static, Yin static')
+    expect(text).toContain('Moving lines: 2, 5')
   })
 })

@@ -1,18 +1,27 @@
 import { createElement } from 'react'
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import './i18n'
+import i18n from './i18n'
 import App, { calculateSupplementalResults } from './App'
 import { useAppStore } from './store/useAppStore'
+import { useHistoryStore } from './store/useHistoryStore'
+import { buildResultSummary } from './utils/resultSummary'
 import * as westernAstroModule from './modules/western-astro'
+
+vi.mock('./utils/resultSummary', () => ({
+  buildResultSummary: vi.fn(() => 'summary'),
+}))
 
 const initialAppState = useAppStore.getState()
 
 afterEach(() => {
   act(() => {
     useAppStore.setState(initialAppState)
+    useHistoryStore.getState().clearHistory()
   })
+  vi.clearAllMocks()
 })
 
 describe('App result page', () => {
@@ -59,7 +68,122 @@ describe('App result page', () => {
 
     render(createElement(App))
 
-    expect(screen.getByRole('button', { name: '複製全部占卜結果' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '複製全部占卜結果' })).toBeTruthy()
+  })
+})
+
+function seedStep2State() {
+  act(() => {
+    useAppStore.setState({
+      ...initialAppState,
+      step: 2,
+      birthDate: '1990-05-10',
+      birthHour: 8,
+      gender: 'male',
+      name: 'Taylor',
+      question: '我現在適合開始諮商嗎？',
+      selectedMethods: [],
+      liuyaoMode: 'manual',
+      liuyaoDraft: null,
+      result: null,
+      isLoading: false,
+      divinationResults: {
+        ...initialAppState.divinationResults,
+        liuyao: null,
+      },
+    })
+  })
+}
+
+function getLiuyaoLineLabel(lineNumber: number) {
+  return i18n.t('liuyaoInput.lineLabel', { value: lineNumber })
+}
+
+function getLiuyaoLabel(key: 'moving' | 'manualSubmit' | 'autoMode' | 'generateDraft') {
+  return i18n.t(`liuyaoInput.${key}`)
+}
+
+describe('App liuyao integration', () => {
+  it('stores the normalized manual liuyao result in the main flow before step 3', async () => {
+    seedStep2State()
+
+    render(createElement(App))
+
+    fireEvent.click(screen.getByRole('button', { name: /六爻/i }))
+
+    expect(screen.getByRole('button', { name: /六爻/i }).getAttribute('aria-pressed')).toBe('true')
+
+    const lineValues = ['yang', 'yin', 'yang', 'yin', 'yang', 'yin']
+
+    lineValues.forEach((value, index) => {
+      fireEvent.change(screen.getByLabelText(getLiuyaoLineLabel(index + 1)), { target: { value } })
+    })
+
+    const movingInputs = screen.getAllByLabelText(getLiuyaoLabel('moving'))
+    fireEvent.click(movingInputs[1])
+    fireEvent.click(movingInputs[4])
+    fireEvent.click(screen.getByRole('button', { name: getLiuyaoLabel('manualSubmit') }))
+    fireEvent.click(screen.getByRole('button', { name: '開始分析' }))
+
+    await screen.findByRole('button', { name: '重新分析' })
+
+    expect(screen.getByText('六爻卦象')).toBeTruthy()
+    expect(screen.getByText('動爻：2、5')).toBeTruthy()
+
+    expect(useAppStore.getState().step).toBe(3)
+    expect(useAppStore.getState().divinationResults.liuyao).toEqual({
+      lines: [
+        { value: 'yang', isMoving: false },
+        { value: 'yin', isMoving: true },
+        { value: 'yang', isMoving: false },
+        { value: 'yin', isMoving: false },
+        { value: 'yang', isMoving: true },
+        { value: 'yin', isMoving: false },
+      ],
+      movingLineIndexes: [2, 5],
+    })
+
+    expect(buildResultSummary).toHaveBeenCalledWith(
+      expect.objectContaining({
+        selectedMethods: ['liuyao'],
+      }),
+    )
+
+    expect(useHistoryStore.getState().records[0]?.selectedMethods).toEqual(['liuyao'])
+    expect(useHistoryStore.getState().records[0]?.divinationResults.liuyao).toEqual({
+      lines: [
+        { value: 'yang', isMoving: false },
+        { value: 'yin', isMoving: true },
+        { value: 'yang', isMoving: false },
+        { value: 'yin', isMoving: false },
+        { value: 'yang', isMoving: true },
+        { value: 'yin', isMoving: false },
+      ],
+      movingLineIndexes: [2, 5],
+    })
+  })
+
+  it('stores the normalized auto liuyao result in the main flow before step 3', async () => {
+    seedStep2State()
+
+    render(createElement(App))
+
+    fireEvent.click(screen.getByRole('button', { name: /六爻/i }))
+    fireEvent.click(screen.getByRole('button', { name: getLiuyaoLabel('autoMode') }))
+    fireEvent.click(screen.getByRole('button', { name: getLiuyaoLabel('generateDraft') }))
+
+    const generatedDraft = useAppStore.getState().liuyaoDraft
+
+    expect(generatedDraft).not.toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '開始分析' }))
+
+    await screen.findByRole('button', { name: '重新分析' })
+
+    expect(screen.getByText('六爻卦象')).toBeTruthy()
+
+    expect(useAppStore.getState().step).toBe(3)
+    expect(useAppStore.getState().divinationResults.liuyao).toEqual(generatedDraft)
   })
 })
 

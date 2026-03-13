@@ -15,6 +15,7 @@ describe('useAppStore', () => {
     expect(state.location).toEqual({ city: '', lat: 0, lng: 0 })
     expect(state.divinationResults).toEqual({
       iching: null,
+      liuyao: null,
       tarot: null,
       ziwei: null,
       bazi: null,

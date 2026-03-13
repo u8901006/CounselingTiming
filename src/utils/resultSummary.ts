@@ -1,4 +1,5 @@
 import { type CounselingRecommendation } from '../analysis/orientation'
+import { formatLiuyaoResult } from '../modules/liuyao'
 import { type DivinationMethod, type DivinationResults } from '../store/useAppStore'
 
 type SummaryTranslationOptions = {
@@ -39,6 +40,13 @@ const DEFAULT_LABELS = {
   ichingOriginalHexagram: '本卦',
   ichingChangedHexagram: '變卦',
   ichingChangingLines: '動爻',
+  liuyaoPrimaryHexagram: '本卦',
+  liuyaoTransformedHexagram: '之卦',
+  liuyaoMovingLines: '動爻',
+  liuyaoYin: '陰',
+  liuyaoYang: '陽',
+  liuyaoMoving: '動',
+  liuyaoStatic: '靜',
   interpretationSummary: '解讀摘要',
   tarotSpread: '牌陣',
   tarotRepresentativeCard: '代表牌',
@@ -72,6 +80,7 @@ const DEFAULT_METHOD_LABELS: Record<DivinationMethod, string> = {
   bazi: '八字',
   iching: '易經',
   tarot: '塔羅',
+  liuyao: '六爻',
   'western-astro': '西洋占星',
   'vedic-astro': '吠陀占星',
   numerology: '數字命理',
@@ -82,6 +91,7 @@ const METHOD_TRANSLATION_KEYS: Record<DivinationMethod, string> = {
   bazi: 'method.bazi',
   iching: 'method.iching',
   tarot: 'method.tarot',
+  liuyao: 'method.liuyao',
   'western-astro': 'method.westernAstro',
   'vedic-astro': 'method.vedicAstro',
   numerology: 'method.numerology',
@@ -135,6 +145,21 @@ function getMethodLabel(method: DivinationMethod, t?: SummaryTranslator): string
 
 function getUnavailableText(t?: SummaryTranslator): string {
   return translate(t, 'resultSummary.unavailable', DEFAULT_LABELS.unavailable)
+}
+
+function getLiuyaoFormattingLabels(t?: SummaryTranslator) {
+  const yin = translate(t, 'resultSummary.liuyaoYin', DEFAULT_LABELS.liuyaoYin)
+  const yang = translate(t, 'resultSummary.liuyaoYang', DEFAULT_LABELS.liuyaoYang)
+  const moving = translate(t, 'resultSummary.liuyaoMoving', DEFAULT_LABELS.liuyaoMoving)
+  const staticLabel = translate(t, 'resultSummary.liuyaoStatic', DEFAULT_LABELS.liuyaoStatic)
+  const usesLatinLineLabels = /^[A-Za-z]+$/.test(yin) && /^[A-Za-z]+$/.test(yang)
+
+  return {
+    yin: usesLatinLineLabels ? `${yin} ` : yin,
+    yang: usesLatinLineLabels ? `${yang} ` : yang,
+    moving,
+    static: staticLabel,
+  }
 }
 
 function readText(value: unknown, fallback: string): string {
@@ -226,6 +251,28 @@ function buildIchingSummary(results: DivinationResults, t?: SummaryTranslator): 
   ]
 }
 
+function buildLiuyaoSummary(results: DivinationResults, t?: SummaryTranslator): string[] {
+  const liuyao = results.liuyao
+  const unavailableText = getUnavailableText(t)
+
+  if (!liuyao) {
+    return [`- ${unavailableText}`]
+  }
+
+  const formatted = formatLiuyaoResult(liuyao, {
+    lineSeparator: getListSeparator(t),
+    movingLineSeparator: getListSeparator(t),
+    movingLineFallback: unavailableText,
+    labels: getLiuyaoFormattingLabels(t),
+  })
+
+  return [
+    buildLine(translate(t, 'resultSummary.liuyaoPrimaryHexagram', DEFAULT_LABELS.liuyaoPrimaryHexagram), formatted.primaryHexagram, t),
+    buildLine(translate(t, 'resultSummary.liuyaoTransformedHexagram', DEFAULT_LABELS.liuyaoTransformedHexagram), formatted.transformedHexagram, t),
+    buildLine(translate(t, 'resultSummary.liuyaoMovingLines', DEFAULT_LABELS.ichingChangingLines), formatted.movingLines, t),
+  ]
+}
+
 function buildTarotSummary(results: DivinationResults, t?: SummaryTranslator): string[] {
   const tarot = results.tarot
   const unavailableText = getUnavailableText(t)
@@ -312,6 +359,8 @@ function buildMethodSummary(method: DivinationMethod, results: DivinationResults
       return buildIchingSummary(results, t)
     case 'tarot':
       return buildTarotSummary(results, t)
+    case 'liuyao':
+      return buildLiuyaoSummary(results, t)
     case 'western-astro':
       return buildWesternAstroSummary(results, t)
     case 'vedic-astro':

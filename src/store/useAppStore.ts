@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { CounselingRecommendation } from '../analysis/orientation'
 import { DivinationResult } from '../modules/iching'
+import { LiuyaoHexagramResult, LiuyaoMode } from '../modules/liuyao'
 import { NumerologyResult } from '../modules/numerology/types'
 import { TarotReading } from '../modules/tarot'
 import { VedicAstroChart } from '../modules/vedic-astro/types'
@@ -12,12 +13,14 @@ export type DivinationMethod =
   | 'bazi'
   | 'iching'
   | 'tarot'
+  | 'liuyao'
   | 'western-astro'
   | 'vedic-astro'
   | 'numerology'
 
 export interface DivinationResults {
   iching: DivinationResult | null
+  liuyao: LiuyaoHexagramResult | null
   tarot: TarotReading | null
   ziwei: ZiweiResult | null
   bazi: BaziResult | null
@@ -41,6 +44,8 @@ interface AppState {
   question: string
   location: LocationInput
   selectedMethods: DivinationMethod[]
+  liuyaoMode: LiuyaoMode
+  liuyaoDraft: LiuyaoHexagramResult | null
   result: CounselingRecommendation | null
   divinationResults: DivinationResults
   isLoading: boolean
@@ -53,8 +58,10 @@ interface AppState {
   setQuestion: (question: string) => void
   setLocation: (location: LocationInput) => void
   toggleMethod: (method: DivinationMethod) => void
+  setLiuyaoMode: (mode: LiuyaoMode) => void
+  setLiuyaoDraft: (draft: LiuyaoHexagramResult | null) => void
   setResult: (result: CounselingRecommendation | null) => void
-  setDivinationResults: (results: DivinationResults) => void
+  setDivinationResults: (results: Partial<DivinationResults> | DivinationResults) => void
   setIsLoading: (loading: boolean) => void
   reset: () => void
 }
@@ -72,9 +79,12 @@ const initialState = {
     lng: 0,
   } as LocationInput,
   selectedMethods: ['ziwei', 'bazi'] as DivinationMethod[],
+  liuyaoMode: 'manual' as LiuyaoMode,
+  liuyaoDraft: null as LiuyaoHexagramResult | null,
   result: null,
   divinationResults: {
     iching: null,
+    liuyao: null,
     tarot: null,
     ziwei: null,
     bazi: null,
@@ -95,13 +105,31 @@ export const useAppStore = create<AppState>((set) => ({
   setName: (name) => set({ name }),
   setQuestion: (question) => set({ question }),
   setLocation: (location) => set({ location }),
-  toggleMethod: (method) => set((state) => ({
-    selectedMethods: state.selectedMethods.includes(method)
-      ? state.selectedMethods.filter((m) => m !== method)
-      : [...state.selectedMethods, method]
-  })),
+  toggleMethod: (method) => set((state) => {
+    const isSelected = state.selectedMethods.includes(method)
+
+    if (method === 'liuyao' && isSelected) {
+      return {
+        selectedMethods: state.selectedMethods.filter((m) => m !== method),
+        liuyaoDraft: null,
+      }
+    }
+
+    return {
+      selectedMethods: isSelected
+        ? state.selectedMethods.filter((m) => m !== method)
+        : [...state.selectedMethods, method],
+    }
+  }),
+  setLiuyaoMode: (liuyaoMode) => set({ liuyaoMode }),
+  setLiuyaoDraft: (liuyaoDraft) => set({ liuyaoDraft }),
   setResult: (result) => set({ result }),
-  setDivinationResults: (divinationResults) => set({ divinationResults }),
+  setDivinationResults: (divinationResults) => set((state) => ({
+    divinationResults: {
+      ...state.divinationResults,
+      ...divinationResults,
+    },
+  })),
   setIsLoading: (isLoading) => set({ isLoading }),
   reset: () => set(initialState),
 }))

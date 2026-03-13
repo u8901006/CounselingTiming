@@ -45,6 +45,8 @@
     "ziweiDesc": "Star Chart Analysis",
     "bazi": "Four Pillars (BaZi)",
     "baziDesc": "Five Elements Analysis",
+    "liuyao": "Liuyao",
+    "liuyaoDesc": "Manual or automatic hexagram casting",
     "iching": "I Ching",
     "ichingDesc": "Yarrow/Coin Divination",
     "tarot": "Tarot",
@@ -62,6 +64,22 @@
     "analyzing": "Analyzing...",
     "prevStep": "Previous"
   },
+  "liuyaoInput": {
+    "modeGroup": "Liuyao mode",
+    "manualMode": "Manual input",
+    "autoMode": "Auto cast",
+    "lineLabel": "Line {{value}}",
+    "linePlaceholder": "Select line",
+    "yang": "Yang",
+    "yin": "Yin",
+    "moving": "Moving",
+    "static": "Static",
+    "manualSubmit": "Use manual draft",
+    "generateDraft": "Generate draft",
+    "rerollDraft": "Reroll draft",
+    "generatedDraft": "Generated draft",
+    "draftLine": "Draft line {{value}}: {{line}}"
+  },
   "result": {
     "timing": "Counseling Timing Assessment",
     "wuxing": "Five Elements Analysis",
@@ -72,7 +90,12 @@
     "deficient": "Deficient Element",
     "westernAstro": "Western Astrology",
     "vedicAstro": "Vedic Astrology",
-    "numerology": "Numerology"
+    "numerology": "Numerology",
+    "liuyao": "Liuyao hexagram",
+    "liuyaoPrimaryHexagram": "Primary hexagram",
+    "liuyaoTransformedHexagram": "Transformed hexagram",
+    "liuyaoMovingLines": "Moving lines",
+    "liuyaoMovingLineFallback": "None"
   },
   "gpt": {
     "title": "GPT Prompt",
@@ -109,6 +132,9 @@
     "ichingOriginalHexagram": "Original hexagram",
     "ichingChangedHexagram": "Changed hexagram",
     "ichingChangingLines": "Changing lines",
+    "liuyaoPrimaryHexagram": "Primary hexagram",
+    "liuyaoTransformedHexagram": "Transformed hexagram",
+    "liuyaoMovingLines": "Moving lines",
     "hexagramNumberValue": " (No. {{value}})",
     "interpretationSummary": "Interpretation summary",
     "tarotSpread": "Spread",
@@ -136,7 +162,11 @@
     "recommendationOverallAdvice": "Overall advice",
     "scoreValue": " ({{score}} pts)",
     "listSeparator": ", ",
-    "fieldSeparator": ": "
+    "fieldSeparator": ": ",
+    "liuyaoYin": "Yin",
+    "liuyaoYang": "Yang",
+    "liuyaoMoving": "moving",
+    "liuyaoStatic": "static"
   },
   "supplemental": {
     "common": {

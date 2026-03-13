@@ -45,6 +45,8 @@
     "ziweiDesc": "命盤分析",
     "bazi": "八字四柱",
     "baziDesc": "五行分析",
+    "liuyao": "六爻",
+    "liuyaoDesc": "手動或自動起卦",
     "iching": "易經",
     "ichingDesc": "蓍草/銅錢占卜",
     "tarot": "塔羅",
@@ -62,6 +64,22 @@
     "analyzing": "分析中...",
     "prevStep": "上一步"
   },
+  "liuyaoInput": {
+    "modeGroup": "六爻模式",
+    "manualMode": "手動輸入",
+    "autoMode": "自動起卦",
+    "lineLabel": "第 {{value}} 爻",
+    "linePlaceholder": "選擇爻象",
+    "yang": "陽",
+    "yin": "陰",
+    "moving": "動爻",
+    "static": "靜爻",
+    "manualSubmit": "使用手動卦稿",
+    "generateDraft": "產生卦稿",
+    "rerollDraft": "重新起卦",
+    "generatedDraft": "已產生卦稿",
+    "draftLine": "卦稿第 {{value}} 爻：{{line}}"
+  },
   "result": {
     "timing": "諮商時機評估",
     "wuxing": "五行特質分析",
@@ -72,7 +90,12 @@
     "deficient": "不足五行",
     "westernAstro": "西洋占星",
     "vedicAstro": "吠陀占星",
-    "numerology": "數字命理"
+    "numerology": "數字命理",
+    "liuyao": "六爻卦象",
+    "liuyaoPrimaryHexagram": "本卦",
+    "liuyaoTransformedHexagram": "之卦",
+    "liuyaoMovingLines": "動爻",
+    "liuyaoMovingLineFallback": "無"
   },
   "gpt": {
     "title": "GPT 提示詞",
@@ -109,6 +132,9 @@
     "ichingOriginalHexagram": "本卦",
     "ichingChangedHexagram": "變卦",
     "ichingChangingLines": "動爻",
+    "liuyaoPrimaryHexagram": "本卦",
+    "liuyaoTransformedHexagram": "之卦",
+    "liuyaoMovingLines": "動爻",
     "hexagramNumberValue": "（第{{value}}卦）",
     "interpretationSummary": "解讀摘要",
     "tarotSpread": "牌陣",
@@ -136,7 +162,11 @@
     "recommendationOverallAdvice": "整體建議",
     "scoreValue": "（{{score}}分）",
     "listSeparator": "、",
-    "fieldSeparator": "："
+    "fieldSeparator": "：",
+    "liuyaoYin": "陰",
+    "liuyaoYang": "陽",
+    "liuyaoMoving": "動",
+    "liuyaoStatic": "靜"
   },
   "supplemental": {
     "common": {

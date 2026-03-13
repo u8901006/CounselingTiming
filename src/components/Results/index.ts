@@ -2,6 +2,7 @@ export { ZiweiResult } from './ZiweiResult';
 export { BaziResult } from './BaziResult';
 export { IChingResult } from './IChingResult';
 export { TarotResult } from './TarotResult';
+export { LiuyaoResult } from './LiuyaoResult';
 export { WesternAstroResult } from './WesternAstroResult';
 export { VedicAstroResult } from './VedicAstroResult';
 export { NumerologyResult } from './NumerologyResult';
