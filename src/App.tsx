@@ -11,10 +11,11 @@ import {
   DivinationResults,
   LocationInput,
 } from './store/useAppStore'
-import { useHistoryStore } from './store/useHistoryStore'
+import { type HistoryRecord, useHistoryStore } from './store/useHistoryStore'
 import { useThemeEffect } from './utils/theme'
 
 import ErrorBoundary from './components/ErrorBoundary'
+import HistoryList from './components/HistoryList'
 import { Header, Footer, ProgressBar } from './components/Layout'
 import { InputForm } from './components/InputForm'
 import MethodSelector from './components/MethodSelector'
@@ -173,8 +174,8 @@ function AppContent() {
     step, setStep,
     birthDate, birthHour, gender, name, question, location,
     setBirthDate, setBirthHour, setGender, setName, setQuestion, setLocation,
-    selectedMethods, toggleMethod,
-    liuyaoDraft,
+    setSelectedMethods, selectedMethods, toggleMethod,
+    liuyaoDraft, setLiuyaoDraft,
     result, setResult,
     divinationResults, setDivinationResults,
     isLoading, setIsLoading,
@@ -308,8 +309,7 @@ function AppContent() {
       const orientation = matchCounselingOrientation(elementScores, ziweiTraits)
       const recommendation = generateFullRecommendation(timing, orientation)
 
-      setResult(recommendation)
-      setDivinationResults({
+      const nextDivinationResults = {
         iching: ichingDivResult,
         liuyao: liuyaoResult,
         tarot: tarotReading,
@@ -318,21 +318,30 @@ function AppContent() {
         westernAstro: supplementalResults.westernAstro,
         vedicAstro: supplementalResults.vedicAstro,
         numerology: supplementalResults.numerology,
+      }
+
+      const summaryText = buildResultSummary({
+        question,
+        selectedMethods,
+        divinationResults: nextDivinationResults,
+        result: recommendation,
+        t,
       })
+
+      setResult(recommendation)
+      setDivinationResults(nextDivinationResults)
 
       addRecord({
         birthDate,
         birthHour,
         gender,
+        name,
+        question,
+        location,
         selectedMethods,
         result: recommendation,
-        divinationResults: {
-          iching: ichingDivResult,
-          liuyao: liuyaoResult,
-          tarot: tarotReading,
-          ziwei: ziweiResult,
-          bazi: baziResult,
-        },
+        divinationResults: nextDivinationResults,
+        summaryText,
       })
 
       setStep(3)
@@ -342,6 +351,20 @@ function AppContent() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSelectHistoryRecord = (record: HistoryRecord) => {
+    setBirthDate(record.birthDate)
+    setBirthHour(record.birthHour)
+    setGender(record.gender)
+    setName(record.name)
+    setQuestion(record.question)
+    setLocation(record.location)
+    setSelectedMethods(record.selectedMethods)
+    setLiuyaoDraft(record.divinationResults.liuyao)
+    setResult(record.result)
+    setDivinationResults(record.divinationResults)
+    setStep(3)
   }
 
   const renderStep1 = () => (
@@ -466,7 +489,10 @@ function AppContent() {
 
       <ProgressBar currentStep={step} totalSteps={3} />
 
-      <main>
+      <main className="space-y-6">
+        <section className="max-w-2xl mx-auto">
+          <HistoryList onSelectRecord={handleSelectHistoryRecord} maxDisplay={5} />
+        </section>
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}

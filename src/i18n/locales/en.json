@@ -112,6 +112,12 @@
     "copyFailed": "Copy failed. Please try again.",
     "nothingToCopy": "There are no results to copy yet."
   },
+  "history": {
+    "title": "History",
+    "empty": "No saved analyses yet",
+    "delete": "Delete",
+    "clearAll": "Clear history"
+  },
   "resultSummary": {
     "title": "Counseling timing summary",
     "question": "Question",

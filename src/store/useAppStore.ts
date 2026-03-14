@@ -57,6 +57,7 @@ interface AppState {
   setName: (name: string) => void
   setQuestion: (question: string) => void
   setLocation: (location: LocationInput) => void
+  setSelectedMethods: (methods: DivinationMethod[]) => void
   toggleMethod: (method: DivinationMethod) => void
   setLiuyaoMode: (mode: LiuyaoMode) => void
   setLiuyaoDraft: (draft: LiuyaoHexagramResult | null) => void
@@ -105,6 +106,7 @@ export const useAppStore = create<AppState>((set) => ({
   setName: (name) => set({ name }),
   setQuestion: (question) => set({ question }),
   setLocation: (location) => set({ location }),
+  setSelectedMethods: (selectedMethods) => set({ selectedMethods }),
   toggleMethod: (method) => set((state) => {
     const isSelected = state.selectedMethods.includes(method)
 

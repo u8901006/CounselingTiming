@@ -112,6 +112,12 @@
     "copyFailed": "複製失敗，請稍後再試。",
     "nothingToCopy": "目前沒有可複製的結果。"
   },
+  "history": {
+    "title": "分析歷史",
+    "empty": "尚無分析記錄",
+    "delete": "刪除",
+    "clearAll": "清除所有記錄"
+  },
   "resultSummary": {
     "title": "諮商時機摘要",
     "question": "問題",
