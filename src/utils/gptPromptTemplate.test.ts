@@ -1,80 +1,134 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildGptPrompt } from './gptPromptTemplate'
+import { type BuildGptPromptInput, buildGptPrompt, hasSupportedGptMethods } from './gptPromptTemplate'
+
+function makePromptInput(selectedMethods: BuildGptPromptInput['selectedMethods']): BuildGptPromptInput {
+  return {
+    question: 'What should I focus on next?',
+    selectedMethods,
+    divinationResults: {
+      iching: {
+        originalHexagram: { number: 1, name: '乾' },
+        changedHexagram: { number: 2, name: '坤' },
+        changingLines: [2, 5],
+        lines: ['yang', 'yang', 'yang', 'yang', 'yang', 'yang'],
+        summary: 'Move with clear intent.',
+        counselingAdvice: 'Take a steady first step.',
+      } as unknown as BuildGptPromptInput['divinationResults']['iching'],
+      liuyao: {
+        lines: [
+          { value: 'yang', isMoving: false },
+          { value: 'yang', isMoving: true },
+          { value: 'yang', isMoving: false },
+          { value: 'yang', isMoving: false },
+          { value: 'yang', isMoving: true },
+          { value: 'yang', isMoving: false },
+        ],
+        movingLineIndexes: [2, 5],
+      } as unknown as BuildGptPromptInput['divinationResults']['liuyao'],
+      tarot: {
+        spread: 'Three-card spread',
+        cards: [
+          {
+            position: 'present',
+            card: {
+              id: 'the-star',
+              name: 'The Star',
+              arcana: 'major',
+              upright: 'Hope',
+              reversed: 'Doubt',
+            },
+            orientation: 'upright',
+          },
+        ],
+        summary: 'Renewed hope is available.',
+        psychologicalState: { emotionalState: 'Hopeful but cautious' },
+        counselingAdvice: 'Use supportive reflection and pacing.',
+      } as unknown as BuildGptPromptInput['divinationResults']['tarot'],
+      ziwei: {
+        majorStars: ['紫微', '天府'],
+        lifeAnalysis: 'Life palace is stable.',
+        personalityAnalysis: 'Thoughtful and sensitive.',
+        counselingAdvice: 'Begin with supportive, exploratory work.',
+      } as unknown as BuildGptPromptInput['divinationResults']['ziwei'],
+      bazi: {
+        yearPillar: '甲子',
+        monthPillar: '乙丑',
+        dayPillar: '丙寅',
+        hourPillar: '丁卯',
+        dayMaster: '丙火',
+        dominantWuxing: '木',
+        deficientWuxing: '金',
+        analysis: 'Growth is strong but boundaries need support.',
+      } as unknown as BuildGptPromptInput['divinationResults']['bazi'],
+      westernAstro: {
+        planets: [
+          {
+            name: 'Sun',
+            nameEn: 'Sun',
+            symbol: 'S',
+            longitude: 0,
+            sign: 'Aries',
+            signEn: 'Aries',
+            degree: 10,
+            minute: 15,
+            retrograde: false,
+          },
+        ],
+        houses: [],
+        ascendant: {
+          name: 'Ascendant',
+          nameEn: 'Ascendant',
+          symbol: 'Asc',
+          longitude: 0,
+          sign: 'Gemini',
+          signEn: 'Gemini',
+          degree: 3,
+          minute: 0,
+          retrograde: false,
+        },
+        midheaven: {
+          name: 'Midheaven',
+          nameEn: 'Midheaven',
+          symbol: 'Mc',
+          longitude: 0,
+          sign: 'Aquarius',
+          signEn: 'Aquarius',
+          degree: 19,
+          minute: 0,
+          retrograde: false,
+        },
+        aspects: [],
+      } as unknown as BuildGptPromptInput['divinationResults']['westernAstro'],
+      vedicAstro: {
+        moonSign: 'Taurus',
+        moonNakshatra: {
+          number: 4,
+          name: 'Rohini',
+          nameEn: 'Rohini',
+          lord: 'Moon',
+          pada: 2,
+        },
+        ascendant: 'Leo',
+        sunSign: 'Aries',
+        dashas: [{ planet: 'Moon', startYear: 2020, duration: 10 }],
+        moonDegree: 15.2,
+      } as unknown as BuildGptPromptInput['divinationResults']['vedicAstro'],
+      numerology: {
+        lifePathNumber: 7,
+        destinyNumber: 3,
+        soulNumber: 9,
+        personalityNumber: 5,
+        birthdayNumber: 1,
+        expressionNumber: 6,
+      } as unknown as BuildGptPromptInput['divinationResults']['numerology'],
+    },
+  }
+}
 
 describe('buildGptPrompt', () => {
   it('uses the real supplemental method ids in the generated prompt', () => {
-    const prompt = buildGptPrompt({
-      question: 'What should I focus on next?',
-      selectedMethods: ['western-astro', 'vedic-astro', 'numerology'],
-      divinationResults: {
-        iching: null,
-        tarot: null,
-        ziwei: null,
-        bazi: null,
-        westernAstro: {
-          planets: [
-            {
-              name: 'Sun',
-              nameEn: 'Sun',
-              symbol: 'S',
-              longitude: 0,
-              sign: 'Aries',
-              signEn: 'Aries',
-              degree: 10,
-              minute: 15,
-              retrograde: false,
-            },
-          ],
-          houses: [],
-          ascendant: {
-            name: 'Ascendant',
-            nameEn: 'Ascendant',
-            symbol: 'Asc',
-            longitude: 0,
-            sign: 'Gemini',
-            signEn: 'Gemini',
-            degree: 3,
-            minute: 0,
-            retrograde: false,
-          },
-          midheaven: {
-            name: 'Midheaven',
-            nameEn: 'Midheaven',
-            symbol: 'Mc',
-            longitude: 0,
-            sign: 'Aquarius',
-            signEn: 'Aquarius',
-            degree: 19,
-            minute: 0,
-            retrograde: false,
-          },
-          aspects: [],
-        },
-        vedicAstro: {
-          moonSign: 'Taurus',
-          moonNakshatra: {
-            number: 4,
-            name: 'Rohini',
-            nameEn: 'Rohini',
-            lord: 'Moon',
-            pada: 2,
-          },
-          ascendant: 'Leo',
-          sunSign: 'Aries',
-          dashas: [{ planet: 'Moon', startYear: 2020, duration: 10 }],
-          moonDegree: 15.2,
-        },
-        numerology: {
-          lifePathNumber: 7,
-          destinyNumber: 3,
-          soulNumber: 9,
-          personalityNumber: 5,
-          birthdayNumber: 1,
-          expressionNumber: 6,
-        },
-      },
-    })
+    const prompt = buildGptPrompt(makePromptInput(['western-astro', 'vedic-astro', 'numerology']))
 
     expect(prompt).toContain('western-astro')
     expect(prompt).toContain('vedic-astro')
@@ -84,12 +138,80 @@ describe('buildGptPrompt', () => {
     expect(prompt).toContain('Life path number: 7')
   })
 
+  it('includes classic references and analysis lens for western astrology', () => {
+    const prompt = buildGptPrompt(makePromptInput(['western-astro']))
+
+    expect(prompt).toContain('[western-astro]')
+    expect(prompt).toContain('Classic references:')
+    expect(prompt).toContain('Analysis lens:')
+    expect(prompt).toContain('- Tetrabiblos')
+    expect(prompt).toContain('- Emphasize planetary placements, angles, and notable aspect patterns.')
+  })
+
+  it('adds global guidance for tradition-based synthesis', () => {
+    const prompt = buildGptPrompt(makePromptInput(['numerology']))
+
+    expect(prompt).toContain('Use the classic references and interpretive lenses below')
+    expect(prompt).toContain('Do not present invented direct quotations')
+    expect(prompt).toContain('Note uncertainty where data is incomplete')
+  })
+
+  it('includes all divination methods in the prompt body', () => {
+    const prompt = buildGptPrompt(makePromptInput([
+      'ziwei',
+      'bazi',
+      'iching',
+      'liuyao',
+      'tarot',
+      'western-astro',
+      'vedic-astro',
+      'numerology',
+    ]))
+
+    expect(prompt).toContain('[ziwei]')
+    expect(prompt).toContain('[bazi]')
+    expect(prompt).toContain('[iching]')
+    expect(prompt).toContain('[liuyao]')
+    expect(prompt).toContain('[tarot]')
+    expect(prompt).toContain('[western-astro]')
+    expect(prompt).toContain('[vedic-astro]')
+    expect(prompt).toContain('[numerology]')
+  })
+
+  it('adds classic references and interpretation lenses for eastern methods', () => {
+    const prompt = buildGptPrompt(makePromptInput(['ziwei', 'bazi', 'iching', 'liuyao']))
+
+    expect(prompt).toContain('紫微斗數全書')
+    expect(prompt).toContain('淵海子平')
+    expect(prompt).toContain('周易')
+    expect(prompt).toContain('增刪卜易')
+    expect(prompt).toContain('Focus on life palace structure, major stars, and temperament patterns.')
+    expect(prompt).toContain('Read day master strength, elemental balance, and timing climate.')
+  })
+
+  it('adds classic references and lenses for tarot and supplemental systems', () => {
+    const prompt = buildGptPrompt(makePromptInput(['tarot', 'western-astro', 'vedic-astro', 'numerology']))
+
+    expect(prompt).toContain('The Pictorial Key to the Tarot')
+    expect(prompt).toContain('Tetrabiblos')
+    expect(prompt).toContain('Brihat Parashara Hora Shastra')
+    expect(prompt).toContain('The Complete Book of Numerology')
+  })
+
+  it('treats all divination methods as supported for GPT prompts', () => {
+    expect(hasSupportedGptMethods(['iching'])).toBe(true)
+    expect(hasSupportedGptMethods(['tarot'])).toBe(true)
+    expect(hasSupportedGptMethods(['ziwei'])).toBe(true)
+    expect(hasSupportedGptMethods(['western-astro'])).toBe(true)
+  })
+
   it('stays readable when method results are partial or missing', () => {
     const prompt = buildGptPrompt({
       question: '',
       selectedMethods: ['western-astro', 'numerology'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         ziwei: null,
         bazi: null,
@@ -138,6 +260,7 @@ describe('buildGptPrompt', () => {
         selectedMethods: ['western-astro', 'vedic-astro'],
         divinationResults: {
           iching: null,
+          liuyao: null,
           tarot: null,
           ziwei: null,
           bazi: null,
@@ -188,6 +311,7 @@ describe('buildGptPrompt', () => {
       selectedMethods: ['western-astro', 'vedic-astro'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         ziwei: null,
         bazi: null,
@@ -237,12 +361,13 @@ describe('buildGptPrompt', () => {
     expect(prompt).toContain('Current dasha sample: unavailable')
   })
 
-  it('includes only supported GPT methods in the prompt body', () => {
+  it('includes every selected method that has prompt metadata', () => {
     const prompt = buildGptPrompt({
       question: 'Keep only supported methods',
       selectedMethods: ['tarot', 'western-astro', 'iching'],
       divinationResults: {
         iching: null,
+        liuyao: null,
         tarot: null,
         ziwei: null,
         bazi: null,
@@ -290,11 +415,11 @@ describe('buildGptPrompt', () => {
       },
     })
 
+    expect(prompt).toContain('- tarot (Tarot)')
     expect(prompt).toContain('- western-astro (Western astrology)')
+    expect(prompt).toContain('- iching (I Ching)')
+    expect(prompt).toContain('[tarot]')
     expect(prompt).toContain('[western-astro]')
-    expect(prompt).not.toContain('- tarot')
-    expect(prompt).not.toContain('[tarot]')
-    expect(prompt).not.toContain('- iching')
-    expect(prompt).not.toContain('[iching]')
+    expect(prompt).toContain('[iching]')
   })
 })

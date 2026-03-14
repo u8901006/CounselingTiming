@@ -1,21 +1,86 @@
+import { formatLiuyaoResult } from '../modules/liuyao'
 import { DivinationMethod, DivinationResults } from '../store/useAppStore'
 
-type SupportedGptMethod = 'western-astro' | 'vedic-astro' | 'numerology'
-
-const SUPPORTED_METHODS: SupportedGptMethod[] = [
-  'western-astro',
-  'vedic-astro',
-  'numerology',
-]
-
-const METHOD_LABELS: Record<SupportedGptMethod, string> = {
-  'western-astro': 'Western astrology',
-  'vedic-astro': 'Vedic astrology',
-  numerology: 'Numerology',
+interface GptMethodConfig {
+  label: string
+  classicReferences: string[]
+  analysisLens: string[]
+  buildSection: (results: DivinationResults) => string[]
 }
 
-function isSupportedGptMethod(method: DivinationMethod): method is SupportedGptMethod {
-  return (SUPPORTED_METHODS as readonly string[]).includes(method)
+const METHOD_CONFIG: Record<DivinationMethod, GptMethodConfig> = {
+  ziwei: {
+    label: 'Zi Wei Dou Shu',
+    classicReferences: ['紫微斗數全書', '紫微斗數全集'],
+    analysisLens: [
+      'Focus on life palace structure, major stars, and temperament patterns.',
+      'Infer counseling timing from stress tendencies and personality dynamics.',
+    ],
+    buildSection: buildZiweiSection,
+  },
+  bazi: {
+    label: 'Ba Zi',
+    classicReferences: ['淵海子平', '三命通會'],
+    analysisLens: [
+      'Read day master strength, elemental balance, and timing climate.',
+      'Consider emotional regulation and support needs through wuxing dynamics.',
+    ],
+    buildSection: buildBaziSection,
+  },
+  iching: {
+    label: 'I Ching',
+    classicReferences: ['周易', '易傳'],
+    analysisLens: [
+      'Read the primary and changed hexagrams as a process of transition.',
+      'Use changing lines to identify timing shifts, cautions, and response strategy.',
+    ],
+    buildSection: buildIchingSection,
+  },
+  tarot: {
+    label: 'Tarot',
+    classicReferences: ['The Pictorial Key to the Tarot', 'Seventy-Eight Degrees of Wisdom'],
+    analysisLens: [
+      'Read symbolic patterns, spread positions, and emotional themes together.',
+      'Highlight psychological readiness, tension, and supportive next steps.',
+    ],
+    buildSection: buildTarotSection,
+  },
+  liuyao: {
+    label: 'Liuyao',
+    classicReferences: ['周易', '增刪卜易'],
+    analysisLens: [
+      'Focus on the primary hexagram, transformed hexagram, and moving lines.',
+      'Interpret timing and decision pressure through change dynamics and line movement.',
+    ],
+    buildSection: buildLiuyaoSection,
+  },
+  'western-astro': {
+    label: 'Western astrology',
+    classicReferences: ['Tetrabiblos', 'Christian Astrology'],
+    analysisLens: [
+      'Emphasize planetary placements, angles, and notable aspect patterns.',
+      'Infer emotional tone and counseling orientation from personality and timing signatures.',
+    ],
+    buildSection: buildWesternSection,
+  },
+  'vedic-astro': {
+    label: 'Vedic astrology',
+    classicReferences: ['Brihat Parashara Hora Shastra', 'Phaladeepika'],
+    analysisLens: [
+      'Read lagna, moon sign, nakshatra, and dasha timing together.',
+      'Frame interpretation through karmic tendencies, timing cycles, and emotional patterning.',
+    ],
+    buildSection: buildVedicSection,
+  },
+  numerology: {
+    label: 'Numerology',
+    classicReferences: ['The Complete Book of Numerology', 'The Numerology Handbook'],
+    analysisLens: [
+      'Read life path, destiny, soul, and personality numbers as a combined pattern.',
+      'Infer developmental emphasis, motivation, and readiness for reflective work.',
+    ],
+    buildSection: buildNumerologySection,
+  },
 }
 
 function readText(value: unknown): string {
@@ -37,7 +102,7 @@ function readArray<T>(value: T[] | undefined): T[] {
   return Array.isArray(value) ? value : []
 }
 
-function getWesternSection(results: DivinationResults): string[] {
+function buildWesternSection(results: DivinationResults): string[] {
   const chart = results.westernAstro
 
   if (!chart) {
@@ -59,7 +124,7 @@ function getWesternSection(results: DivinationResults): string[] {
   ]
 }
 
-function getVedicSection(results: DivinationResults): string[] {
+function buildVedicSection(results: DivinationResults): string[] {
   const chart = results.vedicAstro
 
   if (!chart) {
@@ -79,7 +144,7 @@ function getVedicSection(results: DivinationResults): string[] {
   ]
 }
 
-function getNumerologySection(results: DivinationResults): string[] {
+function buildNumerologySection(results: DivinationResults): string[] {
   const chart = results.numerology
 
   if (!chart) {
@@ -96,17 +161,86 @@ function getNumerologySection(results: DivinationResults): string[] {
   ]
 }
 
-function getMethodSection(method: DivinationMethod, results: DivinationResults): string[] {
-  switch (method) {
-    case 'western-astro':
-      return getWesternSection(results)
-    case 'vedic-astro':
-      return getVedicSection(results)
-    case 'numerology':
-      return getNumerologySection(results)
-    default:
-      return ['- Unsupported method for this prompt.']
+function buildZiweiSection(results: DivinationResults): string[] {
+  const chart = results.ziwei
+
+  if (!chart) {
+    return ['- Result data unavailable.']
   }
+
+  return [
+    `- Major stars: ${readArray(chart.majorStars).join(', ') || 'unavailable'}`,
+    `- Life palace analysis: ${readText(chart.lifeAnalysis)}`,
+    `- Personality analysis: ${readText(chart.personalityAnalysis)}`,
+    `- Counseling advice: ${readText(chart.counselingAdvice)}`,
+  ]
+}
+
+function buildBaziSection(results: DivinationResults): string[] {
+  const chart = results.bazi
+
+  if (!chart) {
+    return ['- Result data unavailable.']
+  }
+
+  return [
+    `- Four pillars: ${[chart.yearPillar, chart.monthPillar, chart.dayPillar, chart.hourPillar].map(readText).join(', ')}`,
+    `- Day master: ${readText(chart.dayMaster)}`,
+    `- Dominant wuxing: ${readText(chart.dominantWuxing)}`,
+    `- Deficient wuxing: ${readText(chart.deficientWuxing)}`,
+    `- Analysis summary: ${readText(chart.analysis)}`,
+  ]
+}
+
+function buildIchingSection(results: DivinationResults): string[] {
+  const result = results.iching
+
+  if (!result) {
+    return ['- Result data unavailable.']
+  }
+
+  return [
+    `- Primary hexagram: ${readText(result.originalHexagram?.name)}`,
+    `- Changed hexagram: ${readText(result.changedHexagram?.name)}`,
+    `- Changing lines: ${readArray(result.changingLines).join(', ') || 'unavailable'}`,
+    `- Interpretation summary: ${readText(result.summary)}`,
+    `- Counseling advice: ${readText(result.counselingAdvice)}`,
+  ]
+}
+
+function buildLiuyaoSection(results: DivinationResults): string[] {
+  const result = results.liuyao
+
+  if (!result) {
+    return ['- Result data unavailable.']
+  }
+
+  const formatted = formatLiuyaoResult(result)
+
+  return [
+    `- Primary hexagram: ${formatted.primaryHexagram}`,
+    `- Transformed hexagram: ${formatted.transformedHexagram}`,
+    `- Moving lines: ${formatted.movingLines}`,
+  ]
+}
+
+function buildTarotSection(results: DivinationResults): string[] {
+  const reading = results.tarot
+
+  if (!reading) {
+    return ['- Result data unavailable.']
+  }
+
+  const firstCard = readArray(reading.cards)[0]
+  const cardName = firstCard?.card?.name
+
+  return [
+    `- Spread: ${readText(reading.spread)}`,
+    `- Representative card: ${cardName ? `${cardName}${firstCard?.position ? ` (${firstCard.position})` : ''}` : 'unavailable'}`,
+    `- Interpretation summary: ${readText(reading.summary)}`,
+    `- Emotional state: ${readText(reading.psychologicalState?.emotionalState)}`,
+    `- Counseling advice: ${readText(reading.counselingAdvice)}`,
+  ]
 }
 
 export interface BuildGptPromptInput {
@@ -120,29 +254,36 @@ export function buildGptPrompt({
   selectedMethods,
   divinationResults,
 }: BuildGptPromptInput): string {
-  const supportedSelections = selectedMethods.filter(isSupportedGptMethod)
+  const supportedSelections = selectedMethods.filter((method) => method in METHOD_CONFIG)
 
   const lines = [
     'Please synthesize these divination results into a clear reading.',
+    'Use the classic references and interpretive lenses below as guiding frameworks.',
+    'Do not present invented direct quotations from those works.',
+    'Note uncertainty where data is incomplete.',
+    'Highlight where multiple methods converge or differ.',
     `User question: ${question.trim() || '(not provided)'}`,
     '',
     'Selected methods:',
-    ...supportedSelections.map((method) => `- ${method} (${METHOD_LABELS[method]})`),
+    ...supportedSelections.map((method) => `- ${method} (${METHOD_CONFIG[method].label})`),
     '',
-    'Method details:',
   ]
 
   for (const method of supportedSelections) {
+    const config = METHOD_CONFIG[method]
     lines.push(`[${method}]`)
-    lines.push(...getMethodSection(method, divinationResults))
+    lines.push('Classic references:')
+    lines.push(...config.classicReferences.map((item) => `- ${item}`))
+    lines.push('Analysis lens:')
+    lines.push(...config.analysisLens.map((item) => `- ${item}`))
+    lines.push('Method details:')
+    lines.push(...config.buildSection(divinationResults))
     lines.push('')
   }
-
-  lines.push('Please note uncertainty where source data is incomplete.')
 
   return lines.join('\n')
 }
 
 export function hasSupportedGptMethods(methods: DivinationMethod[]): boolean {
-  return methods.some(isSupportedGptMethod)
+  return methods.some((method) => method in METHOD_CONFIG)
 }
