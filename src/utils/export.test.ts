@@ -52,6 +52,13 @@ describe('exportSummaryAsPDF', () => {
     expect(mockSave).toHaveBeenCalledWith('report.pdf')
   })
 
+  it('registers the subset font module before writing text', async () => {
+    await exportSummaryAsPDF({ content: '諮商時機摘要', filename: 'subset-report' })
+
+    expect(mockAddFileToVFS).toHaveBeenCalledWith(PDF_FONT_FILE, PDF_FONT_DATA)
+    expect(mockAddFont).toHaveBeenCalledWith(PDF_FONT_FILE, PDF_FONT_FAMILY, 'normal')
+  })
+
   it('adds a new page when wrapped text exceeds the page height', async () => {
     mockSplitTextToSize.mockReturnValueOnce(Array.from({ length: 60 }, (_, index) => `line-${index + 1}`))
 
