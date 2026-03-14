@@ -463,7 +463,7 @@ function AppContent() {
             summaryText={resultSummary}
             hasMeaningfulContent={hasMeaningfulResultSummary}
           />
-          <ExportButton targetId="result-content" />
+          <ExportButton targetId="result-content" summaryText={resultSummary} />
         </div>
 
         <button

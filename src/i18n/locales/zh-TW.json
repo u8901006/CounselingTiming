@@ -118,6 +118,14 @@
     "delete": "刪除",
     "clearAll": "清除所有記錄"
   },
+  "export": {
+    "exportImage": "匯出圖片",
+    "exportPdf": "匯出 PDF",
+    "exporting": "匯出中...",
+    "exportImageFailed": "匯出圖片失敗，請稍後再試",
+    "exportPdfFailed": "匯出 PDF 失敗，請稍後再試",
+    "exportedAt": "匯出時間"
+  },
   "resultSummary": {
     "title": "諮商時機摘要",
     "question": "問題",

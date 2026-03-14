@@ -118,6 +118,14 @@
     "delete": "Delete",
     "clearAll": "Clear history"
   },
+  "export": {
+    "exportImage": "Export image",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting...",
+    "exportImageFailed": "Image export failed. Please try again.",
+    "exportPdfFailed": "PDF export failed. Please try again.",
+    "exportedAt": "Exported at"
+  },
   "resultSummary": {
     "title": "Counseling timing summary",
     "question": "Question",
