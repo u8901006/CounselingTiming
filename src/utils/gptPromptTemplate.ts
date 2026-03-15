@@ -244,12 +244,54 @@ function buildTarotSection(results: DivinationResults): string[] {
 }
 
 export interface BuildGptPromptInput {
+  name: string
+  gender: 'male' | 'female'
+  birthDate: string
+  birthHour: number
+  locationName: string
   question: string
   selectedMethods: DivinationMethod[]
   divinationResults: DivinationResults
 }
 
+function buildPersonalProfileSection(input: BuildGptPromptInput): string[] {
+  return [
+    'Personal profile:',
+    `- Name: ${readText(input.name)}`,
+    `- Gender: ${input.gender}`,
+    `- Birth date (Gregorian): ${readText(input.birthDate)}`,
+    `- Birth hour: ${readNumber(input.birthHour)}`,
+    `- Birth location: ${readText(input.locationName)}`,
+    `- User question: ${input.question.trim() || '(not provided)'}`,
+    '',
+  ]
+}
+
+function buildCoreMetaphysicalContext(results: DivinationResults): string[] {
+  const bazi = results.bazi
+  const unavailable = 'unavailable'
+  const fourPillars = bazi
+    ? [bazi.yearPillar, bazi.monthPillar, bazi.dayPillar, bazi.hourPillar]
+      .map(readText)
+      .join('、')
+    : unavailable
+
+  return [
+    'Core metaphysical context:',
+    `- Four pillars: ${fourPillars}`,
+    `- Day master: ${bazi ? readText(bazi.dayMaster) : unavailable}`,
+    `- Dominant wuxing: ${bazi ? readText(bazi.dominantWuxing) : unavailable}`,
+    `- Deficient wuxing: ${bazi ? readText(bazi.deficientWuxing) : unavailable}`,
+    '',
+  ]
+}
+
 export function buildGptPrompt({
+  name,
+  gender,
+  birthDate,
+  birthHour,
+  locationName,
   question,
   selectedMethods,
   divinationResults,
@@ -260,10 +302,22 @@ export function buildGptPrompt({
     'Please synthesize these divination results into a clear reading.',
     'Use the classic references and interpretive lenses below as guiding frameworks.',
     'Do not present invented direct quotations from those works.',
+    'This prompt contains full personal profile data for this analysis only.',
+    'Do not repeat unnecessary personal identifiers in the final answer.',
     'Note uncertainty where data is incomplete.',
     'Highlight where multiple methods converge or differ.',
-    `User question: ${question.trim() || '(not provided)'}`,
     '',
+    ...buildPersonalProfileSection({
+      name,
+      gender,
+      birthDate,
+      birthHour,
+      locationName,
+      question,
+      selectedMethods,
+      divinationResults,
+    }),
+    ...buildCoreMetaphysicalContext(divinationResults),
     'Selected methods:',
     ...supportedSelections.map((method) => `- ${method} (${METHOD_CONFIG[method].label})`),
     '',
@@ -280,6 +334,11 @@ export function buildGptPrompt({
     lines.push(...config.buildSection(divinationResults))
     lines.push('')
   }
+
+  lines.push('Final response requirements:')
+  lines.push('- Start with an overall judgment about timing, emotional readiness, and counseling direction.')
+  lines.push('- Explain where methods converge or diverge, and what that means for confidence.')
+  lines.push('- End with concrete guidance and practical next steps.')
 
   return lines.join('\n')
 }

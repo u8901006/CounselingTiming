@@ -100,6 +100,7 @@
   "gpt": {
     "title": "GPT 提示詞",
     "description": "將這段提示詞貼到 ChatGPT；若剪貼簿權限失敗，也可直接從預覽區手動複製。",
+    "personalDataNotice": "此提示詞包含姓名、生日、生辰與出生地等完整個資，貼到外部 AI 前請自行確認。",
     "previewLabel": "GPT 提示詞預覽",
     "copy": "複製提示詞",
     "copied": "已複製",

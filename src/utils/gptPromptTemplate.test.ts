@@ -4,6 +4,11 @@ import { type BuildGptPromptInput, buildGptPrompt, hasSupportedGptMethods } from
 
 function makePromptInput(selectedMethods: BuildGptPromptInput['selectedMethods']): BuildGptPromptInput {
   return {
+    name: '王小明',
+    gender: 'male',
+    birthDate: '1990-05-10',
+    birthHour: 8,
+    locationName: 'Taipei',
     question: 'What should I focus on next?',
     selectedMethods,
     divinationResults: {
@@ -126,6 +131,19 @@ function makePromptInput(selectedMethods: BuildGptPromptInput['selectedMethods']
   }
 }
 
+function withFullContext(
+  input: Omit<BuildGptPromptInput, 'name' | 'gender' | 'birthDate' | 'birthHour' | 'locationName'>,
+): BuildGptPromptInput {
+  return {
+    name: '王小明',
+    gender: 'male',
+    birthDate: '1990-05-10',
+    birthHour: 8,
+    locationName: 'Taipei',
+    ...input,
+  }
+}
+
 describe('buildGptPrompt', () => {
   it('uses the real supplemental method ids in the generated prompt', () => {
     const prompt = buildGptPrompt(makePromptInput(['western-astro', 'vedic-astro', 'numerology']))
@@ -136,6 +154,41 @@ describe('buildGptPrompt', () => {
     expect(prompt).toContain('Sun sign: Aries')
     expect(prompt).toContain('Moon nakshatra: Rohini')
     expect(prompt).toContain('Life path number: 7')
+  })
+
+  it('includes a personal profile section with full user context', () => {
+    const prompt = buildGptPrompt(makePromptInput(['bazi']))
+
+    expect(prompt).toContain('Personal profile:')
+    expect(prompt).toContain('- Name: 王小明')
+    expect(prompt).toContain('- Gender: male')
+    expect(prompt).toContain('- Birth date (Gregorian): 1990-05-10')
+    expect(prompt).toContain('- Birth hour: 8')
+    expect(prompt).toContain('- Birth location: Taipei')
+  })
+
+  it('includes core metaphysical context from bazi results', () => {
+    const prompt = buildGptPrompt(makePromptInput(['bazi']))
+
+    expect(prompt).toContain('Core metaphysical context:')
+    expect(prompt).toContain('- Four pillars: 甲子、乙丑、丙寅、丁卯')
+    expect(prompt).toContain('- Day master: 丙火')
+  })
+
+  it('adds a privacy notice for full personal context', () => {
+    const prompt = buildGptPrompt(makePromptInput(['ziwei']))
+
+    expect(prompt).toContain('This prompt contains full personal profile data')
+    expect(prompt).toContain('Do not repeat unnecessary personal identifiers')
+  })
+
+  it('asks GPT for concrete synthesis instead of raw restatement', () => {
+    const prompt = buildGptPrompt(makePromptInput(['ziwei', 'bazi']))
+
+    expect(prompt).toContain('Final response requirements:')
+    expect(prompt).toContain('Start with an overall judgment')
+    expect(prompt).toContain('Explain where methods converge or diverge')
+    expect(prompt).toContain('End with concrete guidance')
   })
 
   it('includes classic references and analysis lens for western astrology', () => {
@@ -206,7 +259,7 @@ describe('buildGptPrompt', () => {
   })
 
   it('stays readable when method results are partial or missing', () => {
-    const prompt = buildGptPrompt({
+    const prompt = buildGptPrompt(withFullContext({
       question: '',
       selectedMethods: ['western-astro', 'numerology'],
       divinationResults: {
@@ -245,9 +298,11 @@ describe('buildGptPrompt', () => {
         vedicAstro: null,
         numerology: null,
       },
-    })
+    }))
 
     expect(prompt).toContain('User question: (not provided)')
+    expect(prompt).toContain('Core metaphysical context:')
+    expect(prompt).toContain('- Four pillars: unavailable')
     expect(prompt).toContain('Sun sign: unavailable')
     expect(prompt).toContain('Ascendant: unavailable')
     expect(prompt).toContain('Result data unavailable.')
@@ -255,7 +310,7 @@ describe('buildGptPrompt', () => {
 
   it('does not throw when supplemental result arrays are missing entirely', () => {
     expect(() =>
-      buildGptPrompt({
+      buildGptPrompt(withFullContext({
         question: 'Help me interpret incomplete data',
         selectedMethods: ['western-astro', 'vedic-astro'],
         divinationResults: {
@@ -303,10 +358,10 @@ describe('buildGptPrompt', () => {
           } as unknown as NonNullable<(typeof buildGptPrompt extends (input: infer T) => string ? T : never)['divinationResults']['vedicAstro']>,
           numerology: null,
         },
-      }),
+      })),
     ).not.toThrow()
 
-    const prompt = buildGptPrompt({
+    const prompt = buildGptPrompt(withFullContext({
       question: 'Help me interpret incomplete data',
       selectedMethods: ['western-astro', 'vedic-astro'],
       divinationResults: {
@@ -354,7 +409,7 @@ describe('buildGptPrompt', () => {
         } as unknown as NonNullable<(typeof buildGptPrompt extends (input: infer T) => string ? T : never)['divinationResults']['vedicAstro']>,
         numerology: null,
       },
-    })
+    }))
 
     expect(prompt).toContain('Ascendant: Libra')
     expect(prompt).toContain('Example aspect: unavailable')
@@ -362,7 +417,7 @@ describe('buildGptPrompt', () => {
   })
 
   it('includes every selected method that has prompt metadata', () => {
-    const prompt = buildGptPrompt({
+    const prompt = buildGptPrompt(withFullContext({
       question: 'Keep only supported methods',
       selectedMethods: ['tarot', 'western-astro', 'iching'],
       divinationResults: {
@@ -413,7 +468,7 @@ describe('buildGptPrompt', () => {
         vedicAstro: null,
         numerology: null,
       },
-    })
+    }))
 
     expect(prompt).toContain('- tarot (Tarot)')
     expect(prompt).toContain('- western-astro (Western astrology)')
