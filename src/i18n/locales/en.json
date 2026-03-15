@@ -100,6 +100,7 @@
   "gpt": {
     "title": "GPT Prompt",
     "description": "Paste this prompt into ChatGPT, or copy it manually from the preview if clipboard access fails.",
+    "personalDataNotice": "This prompt includes full personal data such as name, birth details, and birth location. Review it before sharing with any external AI service.",
     "previewLabel": "GPT prompt preview",
     "copy": "Copy prompt",
     "copied": "Copied",
@@ -111,6 +112,20 @@
     "copied": "Copied all results",
     "copyFailed": "Copy failed. Please try again.",
     "nothingToCopy": "There are no results to copy yet."
+  },
+  "history": {
+    "title": "History",
+    "empty": "No saved analyses yet",
+    "delete": "Delete",
+    "clearAll": "Clear history"
+  },
+  "export": {
+    "exportImage": "Export image",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting...",
+    "exportImageFailed": "Image export failed. Please try again.",
+    "exportPdfFailed": "PDF export failed. Please try again.",
+    "exportedAt": "Exported at"
   },
   "resultSummary": {
     "title": "Counseling timing summary",

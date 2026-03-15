@@ -7,17 +7,31 @@ import { buildGptPrompt, hasSupportedGptMethods } from '../../utils/gptPromptTem
 
 export function GPTIntegration() {
   const { t } = useTranslation()
-  const { question, selectedMethods, divinationResults } = useAppStore()
+  const {
+    name,
+    gender,
+    birthDate,
+    birthHour,
+    location,
+    question,
+    selectedMethods,
+    divinationResults,
+  } = useAppStore()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
 
   const prompt = useMemo(
     () =>
       buildGptPrompt({
+        name,
+        gender,
+        birthDate,
+        birthHour,
+        locationName: location.city,
         question,
         selectedMethods,
         divinationResults,
       }),
-    [divinationResults, question, selectedMethods],
+    [birthDate, birthHour, divinationResults, gender, location.city, name, question, selectedMethods],
   )
 
   useEffect(() => {
@@ -51,6 +65,9 @@ export function GPTIntegration() {
         <h2 className="text-xl font-bold mb-2">{t('gpt.title')}</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {t('gpt.description')}
+        </p>
+        <p className="mt-2 text-sm text-amber-700 dark:text-amber-300">
+          {t('gpt.personalDataNotice')}
         </p>
       </div>
 

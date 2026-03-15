@@ -1,6 +1,11 @@
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 
+interface ExportSummaryAsPDFInput {
+  content: string
+  filename?: string
+}
+
 export async function exportAsImage(elementId: string, filename: string = 'counseling-result'): Promise<void> {
   const element = document.getElementById(elementId)
   if (!element) {
@@ -60,4 +65,42 @@ export async function exportAsPDF(elementId: string, filename: string = 'counsel
     console.error('Failed to export as PDF:', error)
     throw error
   }
+}
+
+export async function exportSummaryAsPDF({
+  content,
+  filename = 'counseling-result',
+}: ExportSummaryAsPDFInput): Promise<void> {
+  const { PDF_FONT_DATA, PDF_FONT_FAMILY, PDF_FONT_FILE } = await import('./pdfFont')
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'pt',
+    format: 'a4',
+  })
+
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  const margin = 40
+  const lineHeight = 20
+  const maxWidth = pageWidth - margin * 2
+
+  pdf.addFileToVFS(PDF_FONT_FILE, PDF_FONT_DATA)
+  pdf.addFont(PDF_FONT_FILE, PDF_FONT_FAMILY, 'normal')
+  pdf.setFont(PDF_FONT_FAMILY, 'normal')
+  pdf.setFontSize(12)
+
+  const lines = pdf.splitTextToSize(content.trim(), maxWidth) as string[]
+  let cursorY = margin
+
+  for (const line of lines) {
+    if (cursorY > pageHeight - margin) {
+      pdf.addPage()
+      cursorY = margin
+    }
+
+    pdf.text(line, margin, cursorY)
+    cursorY += lineHeight
+  }
+
+  pdf.save(`${filename}.pdf`)
 }

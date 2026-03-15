@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useHistoryStore, HistoryRecord } from '../../store/useHistoryStore'
 import { DivinationMethod } from '../../store/useAppStore'
 
@@ -39,25 +40,46 @@ const formatDate = (timestamp: number): string => {
   })
 }
 
+function buildPreview(summaryText: string): string {
+  return summaryText
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(' ')
+}
+
 export default function HistoryList({ onSelectRecord, maxDisplay = 10 }: HistoryListProps) {
+  const { t } = useTranslation()
   const { records, removeRecord, clearHistory } = useHistoryStore()
   const displayRecords = records.slice(0, maxDisplay)
 
   if (displayRecords.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-        <p className="text-lg">尚無分析記錄</p>
+        <p className="text-lg">{t('history.empty')}</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('history.title')}</h2>
+      </div>
       {displayRecords.map((record) => (
         <div
           key={record.id}
           onClick={() => onSelectRecord?.(record)}
-          className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md cursor-pointer transition-shadow"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              onSelectRecord?.(record)
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
         >
           <div className="flex justify-between items-start">
             <div className="flex-1 min-w-0">
@@ -65,7 +87,10 @@ export default function HistoryList({ onSelectRecord, maxDisplay = 10 }: History
                 {formatDate(record.timestamp)}
               </div>
               <div className="font-medium text-gray-900 dark:text-white truncate">
-                {record.birthDate}
+                {record.question.trim() || record.name.trim() || record.birthDate}
+              </div>
+              <div className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                {buildPreview(record.summaryText)}
               </div>
               <div className="flex flex-wrap gap-1 mt-1">
                 {record.selectedMethods.map((method) => (
@@ -85,7 +110,8 @@ export default function HistoryList({ onSelectRecord, maxDisplay = 10 }: History
                 removeRecord(record.id)
               }}
               className="ml-2 p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
-              title="刪除"
+              title={t('history.delete')}
+              aria-label={t('history.delete')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +137,7 @@ export default function HistoryList({ onSelectRecord, maxDisplay = 10 }: History
           onClick={clearHistory}
           className="w-full mt-4 py-2 px-4 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors"
         >
-          清除所有記錄
+          {t('history.clearAll')}
         </button>
       )}
     </div>

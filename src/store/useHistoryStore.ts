@@ -1,19 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { CounselingRecommendation } from '../analysis/orientation'
-import { DivinationResult } from '../modules/iching'
-import { LiuyaoHexagramResult } from '../modules/liuyao'
-import { TarotReading } from '../modules/tarot'
-import { ZiweiResult, BaziResult } from '../modules/ziwei'
-import { DivinationMethod } from './useAppStore'
-
-interface DivinationResultsSnapshot {
-  iching: DivinationResult | null
-  liuyao: LiuyaoHexagramResult | null
-  tarot: TarotReading | null
-  ziwei: ZiweiResult | null
-  bazi: BaziResult | null
-}
+import { DivinationMethod, DivinationResults, LocationInput } from './useAppStore'
 
 export interface HistoryRecord {
   id: string
@@ -21,9 +9,13 @@ export interface HistoryRecord {
   birthDate: string
   birthHour: number
   gender: 'male' | 'female'
+  name: string
+  question: string
+  location: LocationInput
   selectedMethods: DivinationMethod[]
   result: CounselingRecommendation | null
-  divinationResults: DivinationResultsSnapshot
+  divinationResults: DivinationResults
+  summaryText: string
 }
 
 interface HistoryState {
